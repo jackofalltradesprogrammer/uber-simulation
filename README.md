@@ -1,8 +1,8 @@
 # UberSimulation
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.3.
+The Simulation Project for Simulation Class. This project simulates the Uber Taxi Cab System in Manhattan.
 
-## Development server
+## NYC Addresses Data
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
