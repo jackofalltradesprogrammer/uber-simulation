@@ -1,6 +1,7 @@
 /// <reference types="@types/googlemaps" />
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '../google-maps/location';
+import { LocsMANHATTAN } from '../google-maps/locations-manhattan';
 
 @Component({
   selector: 'app-google-maps',
@@ -15,6 +16,9 @@ export class GoogleMapsComponent implements OnInit {
   gmapElement: any;
  
   map: google.maps.Map;
+
+  // Get the 50,000 addresses for manhattan
+  locsManhattan = LocsMANHATTAN;
 
   // center the map to this lat and long
   manhattan: Location = {
@@ -34,6 +38,16 @@ export class GoogleMapsComponent implements OnInit {
     };
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
+    // Randomly Select addresses and add markers to the map
+    for (let index = 0; index < 100; index++) {
+      var randomIndex = Math.floor(Math.random() * 48000) + 1  
+      var loc: any = new google.maps.LatLng(this.locsManhattan[randomIndex]["latitude"], this.locsManhattan[randomIndex]["longitude"]);
+      var marker = new google.maps.Marker({position: loc, map: this.map});
+      if (randomIndex % 2 == 0) {
+        marker.setMap(null);
+      }
+     
+    }
   }
   
   // Styles for  a custom map  for the simulation
