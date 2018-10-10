@@ -1,2 +1,17 @@
 <h1>{{title}}</h1>
-<app-google-maps></app-google-maps>
+
+
+
+  <div style="float: right;">
+    <label>Drivers:
+        <input [(ngModel)]="drivers" placeholder="Drivers">
+      </label>
+  </div>
+  <br>
+  <div style="float: right;">
+    <label>Customers:
+      <input [(ngModel)]="customers" placeholder="customers">
+    </label>
+  </div>
+
+  <app-google-maps></app-google-maps>
