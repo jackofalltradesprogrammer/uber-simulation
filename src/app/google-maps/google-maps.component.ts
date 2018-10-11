@@ -38,18 +38,32 @@ export class GoogleMapsComponent implements OnInit {
     };
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
+    
+
     // Randomly Select addresses and add markers to the map
-    for (let index = 0; index < 100; index++) {
-      var randomIndex = Math.floor(Math.random() * 48000) + 1  
+    for (let index = 0; index < 20; index++) {
+      var randomIndex = Math.floor(Math.random() * 48000) + 1 
+      var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      var image = '../../assets/taxi.png';  //downloaded from flaticon
+      
       var loc: any = new google.maps.LatLng(this.locsManhattan[randomIndex]["latitude"], this.locsManhattan[randomIndex]["longitude"]);
-      var marker = new google.maps.Marker({position: loc, map: this.map});
+      var marker = new google.maps.Marker({position: loc,
+         map: this.map,
+        //  label: labels[index % labels.length],
+         icon: image, 
+         title: index + 'e'});
       if (randomIndex % 2 == 0) {
         marker.setMap(null);
       }
-     
+      // use to bounce the marker
+      marker.setAnimation(google.maps.Animation.BOUNCE);
     }
+
+    
   }
   
+  
+
   // Styles for  a custom map  for the simulation
   customMap:any[] = [
     {
