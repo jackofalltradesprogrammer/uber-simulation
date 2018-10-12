@@ -10,24 +10,24 @@ import { LocsMANHATTAN, ZonesMANHATTAN } from '../google-maps/locations-manhatta
 })
 export class GoogleMapsComponent implements OnInit {
 
-  
+
   // gmapElement is a reference to <div #gmap> inside html file
   @ViewChild('gmap')
   gmapElement: any;
- 
+
   map: google.maps.Map;
   drivers: google.maps.Marker[];
-  zones: Location[][] ;
+  zones: Location[][];
 
   constructor() {
     // Initialize the zones
-    this.zones=[];
-    for (let i = 0; i < 16; i++) {
-      this.zones[i]=[];
-           
-      
+    this.zones = [];
+    for (let i = 0; i < 18; i++) {
+      this.zones[i] = [];
+
+
     }
-    
+
   }
 
   // Get the 50,000 addresses for manhattan & Zones
@@ -40,103 +40,114 @@ export class GoogleMapsComponent implements OnInit {
     longitude: -73.9712
   };
   centerMap: any = new google.maps.LatLng(this.manhattan.latitude, this.manhattan.longitude);
-    
+
   ngOnInit() {
 
-     // Define map properties
-     var mapProp = {
+    // Define map properties
+    var mapProp = {
       center: this.centerMap,
       zoom: 15,
       styles: this.customMap,
       mapTypeId: google.maps.MapTypeId.TERRAIN
     };
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
-    // this.zones[0].push(new Location(234,234))
+    this.zones[0].push(new Location(234, 234))
     // console.log(this.zones[0][0]["latitude"]);
-    for (let index = 0; index < this.locsManhattan.length; index++ ) {
+    for (let index = 0; index < this.locsManhattan.length; index++) {
       var lat = this.locsManhattan[index]["latitude"];
       var long = this.locsManhattan[index]["longitude"];
-      
+      // console.log("this is zone#" + index + " vs " + long);
       // randomly place drivers in 16 zones 
-      console.log("dsfdsf " + index + "vs" + index);
-      for (let zonesIndex = 0; zonesIndex < 15; zonesIndex++) {
-        for (let zone = 0; index < this.zonesManhattan.length; index++) {
 
+      for (let zonesIndex = 0; zonesIndex < 15; zonesIndex++) {
+        for (let zone = 0; zone < this.zonesManhattan.length-1; zone++) {
+          // console.log("this is zone#" + zone);
           var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
           var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
           var latZoneInner = this.zonesManhattan[zone]["latitude"];
-          if ((zone % 2 == 0) && lat < latZoneOuter && long <= longZoneOuter
+
+          // console.log("this is " + this.zonesManhattan.length);
+          if ((zone % 2 == 0) && (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long <= longZoneOuter
             && lat > latZoneInner
           ) {
+            // console.log("this is zone#" + zone + " vs " + zonesIndex);
             this.zones[zonesIndex].push(new Location(lat, long));
-            index++;zonesIndex
+
           }
-          else if ((zone % 2 != 0) && lat < latZoneOuter && long > longZoneOuter
+          else if ((zone % 2 != 0) && (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long > longZoneOuter
             && lat > latZoneInner
           ) {
             this.zones[zonesIndex].push(new Location(lat, long));
-            index++;
+            // console.log("this is zone" + zone + " vs " + zonesIndex);
           }
         }
       }// this.dispatchDrivers(lat, long);
-    }  
-  
-
-    
-    // Randomly Select addresses and add markers to the map
-    for (let index = 0; index < 20; ) {
-      var randomIndex = Math.floor(Math.random() * 48000) + 1
-      var lat = this.locsManhattan[randomIndex]["latitude"];
-      var long = this.locsManhattan[randomIndex]["longitude"];
-      
-      // randomly place drivers in 16 zones 
-      console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
-      for (let zone = 0; zone < 8; zone++) {
-        var latZoneOuter = this.zonesManhattan[zone+1]["latitude"];
-        var longZoneOuter = this.zonesManhattan[zone+1]["longitude"];
-        var latZoneInner = this.zonesManhattan[zone]["latitude"];
-        if ( (zone%2 == 0) && lat < latZoneOuter && long <= longZoneOuter
-          && lat > latZoneInner
-        ){
-          this.dispatchDriver(lat, long);
-          index++;
-        } 
-        else if ( (zone%2 != 0) && lat < latZoneOuter && long > longZoneOuter
-          && lat > latZoneInner
-        ){
-          this.dispatchDriver(lat, long);
-          index++;          
-        } 
-      }
-        // this.dispatchDrivers(lat, long);
     }
 
-    
-  }
-  
-  dispatchDriver(lat:number, long:number): void {
-    var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      var image = '../../assets/utaxi.png';  //downloaded from flaticon
+
+
+    // Randomly Select addresses and add markers to the map
+    // for (let index = 0; index < 20;) {
+    //   var randomIndex = Math.floor(Math.random() * 48000) + 1
+    //   var lat = this.locsManhattan[randomIndex]["latitude"];
+    //   var long = this.locsManhattan[randomIndex]["longitude"];
+
+    //   // randomly place drivers in 16 zones 
+    //   // console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
+    //   for (let zone = 0; zone < 8; zone++) {
+    //     var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
+    //     var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
+    //     var latZoneInner = this.zonesManhattan[zone]["latitude"];
+    //     if ((zone % 2 == 0) && lat < latZoneOuter && long <= longZoneOuter
+    //       && lat > latZoneInner
+    //     ) {
+    //       this.dispatchDriver(lat, long);
+    //       index++;
+    //     }
+    //     else if ((zone % 2 != 0) && lat < latZoneOuter && long > longZoneOuter
+    //       && lat > latZoneInner
+    //     ) {
+    //       this.dispatchDriver(lat, long);
+    //       index++;
+    //     }
+    //   }
+    //   // this.dispatchDrivers(lat, long);
+    // }
+
+    for (let zone1 = 0; zone1 < this.zones.length; zone1++) {
+      console.log("********************       #happy" + zone1 + "      **********************" );
+      this.zones[zone1].forEach(loc => {
+        console.log(loc["latitude"] + " " + loc["longitude"]);
       
-      var loc: any = new google.maps.LatLng(lat, long );
-      var marker = new google.maps.Marker({position: loc,
-         map: this.map,
-        //  label: labels[index % labels.length],
-         icon: image, 
-         //title: index + 'e'
-        });
-      // if (randomIndex % 2 == 0) {
-      //   marker.setMap(null);
-      // }
-      // use to bounce the marker
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-      // this.drivers.push(marker);
+      });
+      
+    }
+  }
+
+  dispatchDriver(lat: number, long: number): void {
+    var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var image = '../../assets/utaxi.png';  //downloaded from flaticon
+
+    var loc: any = new google.maps.LatLng(lat, long);
+    var marker = new google.maps.Marker({
+      position: loc,
+      map: this.map,
+      //  label: labels[index % labels.length],
+      icon: image,
+      //title: index + 'e'
+    });
+    // if (randomIndex % 2 == 0) {
+    //   marker.setMap(null);
+    // }
+    // use to bounce the marker
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    // this.drivers.push(marker);
 
   }
-  
+
 
   // Styles for  a custom map  for the simulation
-  customMap:any[] = [
+  customMap: any[] = [
     {
       "elementType": "geometry",
       "stylers": [
@@ -403,6 +414,6 @@ export class GoogleMapsComponent implements OnInit {
       ]
     }
   ];
-  
+
 
 }
