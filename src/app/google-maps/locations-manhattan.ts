@@ -1,11 +1,7 @@
 import { Location } from './location';
 export const ZonesMANHATTAN: Location[] =[
     {
-      "latitude": 0,
-      "longitude": 0
-    },
-    {
-      "latitude": 40.733893,
+      "latitude": 40.709245,
       "longitude": -73.991168
     },
     {
@@ -13,35 +9,31 @@ export const ZonesMANHATTAN: Location[] =[
       "longitude": -73.991168
     },
     {
-      "latitude": 40.733893,
-      "longitude": -73.991168
+      "latitude": 40.750251,
+      "longitude": -73.989017
     },
     {
-      "latitude": 40.733893,
-      "longitude": -73.991168
+      "latitude": 40.767240,
+      "longitude": -73.977539
     },
     {
-      "latitude": 40.733893,
-      "longitude": -73.991168
+      "latitude": 40.779466,
+      "longitude": -73.966833
     },
     {
-      "latitude": 40.733893,
-      "longitude": -73.991168
+      "latitude": 40.792035,
+      "longitude": -73.962230
     },
     {
-      "latitude": 40.733893,
-      "longitude": -73.991168
+      "latitude": 40.799164,
+      "longitude": -73.954718
+    },
+    {
+      "latitude": 40.806123,
+      "longitude": -73.950457
     },{
-      "latitude": 40.733893,
-      "longitude": -73.991168
-    },
-    {
-      "latitude": 40.733893,
-      "longitude": -73.991168
-    },
-    {
-      "latitude": 47.0,
-      "longitude": -79.991168
+      "latitude": 40.820462,
+      "longitude": -73.942606
     }
 ];
 export const LocsMANHATTAN: Location[] = [

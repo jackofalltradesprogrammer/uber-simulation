@@ -10,13 +10,19 @@ import { LocsMANHATTAN, ZonesMANHATTAN } from '../google-maps/locations-manhatta
 })
 export class GoogleMapsComponent implements OnInit {
 
-  constructor() { }
+  
   // gmapElement is a reference to <div #gmap> inside html file
   @ViewChild('gmap')
   gmapElement: any;
  
   map: google.maps.Map;
   drivers: google.maps.Marker[];
+  zones: google.maps.Marker[][];
+
+  constructor() {
+    
+  }
+
   // Get the 50,000 addresses for manhattan & Zones
   locsManhattan = LocsMANHATTAN;
   zonesManhattan = ZonesMANHATTAN;
@@ -40,40 +46,41 @@ export class GoogleMapsComponent implements OnInit {
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
     
-    let index = 0;
+  
+
+    
     // Randomly Select addresses and add markers to the map
-    for (let index2 = 0; index2 < 20; index2++ ) {
+    for (let index = 0; index < 20; ) {
       var randomIndex = Math.floor(Math.random() * 48000) + 1
       var lat = this.locsManhattan[randomIndex]["latitude"];
       var long = this.locsManhattan[randomIndex]["longitude"];
-      var latZoneOuter = this.zonesManhattan[index+1]["latitude"];
-      var longZoneOuter = this.zonesManhattan[index+1]["longitude"];
-      var latZoneInner = this.zonesManhattan[index+1]["latitude"];
-      // var longZoneInner = this.zonesManhattan[index+1]["longitude"];
-     
-        if ( (index%2 == 0) && lat < latZoneOuter && long < longZoneOuter
+      
+      // randomly place drivers in 16 zones 
+      console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
+      for (let zone = 0; zone < 8; zone++) {
+        var latZoneOuter = this.zonesManhattan[zone+1]["latitude"];
+        var longZoneOuter = this.zonesManhattan[zone+1]["longitude"];
+        var latZoneInner = this.zonesManhattan[zone]["latitude"];
+        if ( (zone%2 == 0) && lat < latZoneOuter && long <= longZoneOuter
           && lat > latZoneInner
         ){
-          this.dispatchDrivers(lat, long);
-          index2++;
+          this.dispatchDriver(lat, long);
           index++;
         } 
-        else if ( (index%2 != 0) && lat < latZoneOuter && long > longZoneOuter
+        else if ( (zone%2 != 0) && lat < latZoneOuter && long > longZoneOuter
           && lat > latZoneInner
         ){
-          this.dispatchDrivers(lat, long);
-          index++;
-          index2++;
-          if(index == 10){index=0;}
-            
+          this.dispatchDriver(lat, long);
+          index++;          
         } 
-        this.dispatchDrivers(lat, long);
+      }
+        // this.dispatchDrivers(lat, long);
     }
 
     
   }
   
-  dispatchDrivers(lat:number, long:number): void {
+  dispatchDriver(lat:number, long:number): void {
     var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       var image = '../../assets/utaxi.png';  //downloaded from flaticon
       
