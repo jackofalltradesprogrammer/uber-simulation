@@ -1,7 +1,7 @@
 /// <reference types="@types/googlemaps" />
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '../google-maps/location';
-import { LocsMANHATTAN } from '../google-maps/locations-manhattan';
+import { LocsMANHATTAN, ZonesMANHATTAN } from '../google-maps/locations-manhattan';
 
 @Component({
   selector: 'app-google-maps',
@@ -16,9 +16,10 @@ export class GoogleMapsComponent implements OnInit {
   gmapElement: any;
  
   map: google.maps.Map;
-
-  // Get the 50,000 addresses for manhattan
+  drivers: google.maps.Marker[];
+  // Get the 50,000 addresses for manhattan & Zones
   locsManhattan = LocsMANHATTAN;
+  zonesManhattan = ZonesMANHATTAN;
 
   // center the map to this lat and long
   manhattan: Location = {
@@ -39,29 +40,58 @@ export class GoogleMapsComponent implements OnInit {
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
     
-
+    let index = 0;
     // Randomly Select addresses and add markers to the map
-    for (let index = 0; index < 20; index++) {
-      var randomIndex = Math.floor(Math.random() * 48000) + 1 
-      var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      var image = '../../assets/taxi.png';  //downloaded from flaticon
-      
-      var loc: any = new google.maps.LatLng(this.locsManhattan[randomIndex]["latitude"], this.locsManhattan[randomIndex]["longitude"]);
-      var marker = new google.maps.Marker({position: loc,
-         map: this.map,
-        //  label: labels[index % labels.length],
-         icon: image, 
-         title: index + 'e'});
-      if (randomIndex % 2 == 0) {
-        marker.setMap(null);
-      }
-      // use to bounce the marker
-      marker.setAnimation(google.maps.Animation.BOUNCE);
+    for (let index2 = 0; index2 < 20; index2++ ) {
+      var randomIndex = Math.floor(Math.random() * 48000) + 1
+      var lat = this.locsManhattan[randomIndex]["latitude"];
+      var long = this.locsManhattan[randomIndex]["longitude"];
+      var latZoneOuter = this.zonesManhattan[index+1]["latitude"];
+      var longZoneOuter = this.zonesManhattan[index+1]["longitude"];
+      var latZoneInner = this.zonesManhattan[index+1]["latitude"];
+      // var longZoneInner = this.zonesManhattan[index+1]["longitude"];
+     
+        if ( (index%2 == 0) && lat < latZoneOuter && long < longZoneOuter
+          && lat > latZoneInner
+        ){
+          this.dispatchDrivers(lat, long);
+          index2++;
+          index++;
+        } 
+        else if ( (index%2 != 0) && lat < latZoneOuter && long > longZoneOuter
+          && lat > latZoneInner
+        ){
+          this.dispatchDrivers(lat, long);
+          index++;
+          index2++;
+          if(index == 10){index=0;}
+            
+        } 
+        this.dispatchDrivers(lat, long);
     }
 
     
   }
   
+  dispatchDrivers(lat:number, long:number): void {
+    var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      var image = '../../assets/utaxi.png';  //downloaded from flaticon
+      
+      var loc: any = new google.maps.LatLng(lat, long );
+      var marker = new google.maps.Marker({position: loc,
+         map: this.map,
+        //  label: labels[index % labels.length],
+         icon: image, 
+         //title: index + 'e'
+        });
+      // if (randomIndex % 2 == 0) {
+      //   marker.setMap(null);
+      // }
+      // use to bounce the marker
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      // this.drivers.push(marker);
+
+  }
   
 
   // Styles for  a custom map  for the simulation
