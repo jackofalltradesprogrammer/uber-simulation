@@ -17,9 +17,16 @@ export class GoogleMapsComponent implements OnInit {
  
   map: google.maps.Map;
   drivers: google.maps.Marker[];
-  zones: google.maps.Marker[][];
+  zones: Location[][] ;
 
   constructor() {
+    // Initialize the zones
+    this.zones=[];
+    for (let i = 0; i < 16; i++) {
+      this.zones[i]=[];
+           
+      
+    }
     
   }
 
@@ -44,8 +51,35 @@ export class GoogleMapsComponent implements OnInit {
       mapTypeId: google.maps.MapTypeId.TERRAIN
     };
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
+    // this.zones[0].push(new Location(234,234))
+    // console.log(this.zones[0][0]["latitude"]);
+    for (let index = 0; index < this.locsManhattan.length; index++ ) {
+      var lat = this.locsManhattan[index]["latitude"];
+      var long = this.locsManhattan[index]["longitude"];
+      
+      // randomly place drivers in 16 zones 
+      console.log("dsfdsf " + index + "vs" + index);
+      for (let zonesIndex = 0; zonesIndex < 15; zonesIndex++) {
+        for (let zone = 0; index < this.zonesManhattan.length; index++) {
 
-    
+          var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
+          var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
+          var latZoneInner = this.zonesManhattan[zone]["latitude"];
+          if ((zone % 2 == 0) && lat < latZoneOuter && long <= longZoneOuter
+            && lat > latZoneInner
+          ) {
+            this.zones[zonesIndex].push(new Location(lat, long));
+            index++;zonesIndex
+          }
+          else if ((zone % 2 != 0) && lat < latZoneOuter && long > longZoneOuter
+            && lat > latZoneInner
+          ) {
+            this.zones[zonesIndex].push(new Location(lat, long));
+            index++;
+          }
+        }
+      }// this.dispatchDrivers(lat, long);
+    }  
   
 
     
