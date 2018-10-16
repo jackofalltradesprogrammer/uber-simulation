@@ -22,7 +22,7 @@ export class GoogleMapsComponent implements OnInit {
   constructor() {
     // Initialize the zones
     this.zones = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 16; i++) {
       this.zones[i] = [];
 
 
@@ -52,33 +52,28 @@ export class GoogleMapsComponent implements OnInit {
     };
     this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
     this.zones[0].push(new Location(234, 234))
-    // console.log(this.zones[0][0]["latitude"]);
     for (let index = 0; index < this.locsManhattan.length; index++) {
       var lat = this.locsManhattan[index]["latitude"];
       var long = this.locsManhattan[index]["longitude"];
-      // console.log("this is zone#" + index + " vs " + long);
-      // randomly place drivers in 16 zones 
+      
+      // Divide 48000 locations into 16 zones (0 - 15)
 
-      for (let zonesIndex = 0; zonesIndex < 15; zonesIndex++) {
+      for (let zonesIndex = 0; zonesIndex < 16; zonesIndex++) {
         for (let zone = 0; zone < this.zonesManhattan.length-1; zone++) {
-          // console.log("this is zone#" + zone);
           var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
           var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
           var latZoneInner = this.zonesManhattan[zone]["latitude"];
-
-          // console.log("this is " + this.zonesManhattan.length);
-          if ((zone % 2 == 0) && (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long <= longZoneOuter
+          // console.log("zone: " + zone + " zoneIndex: " + zonesIndex + " zone*2 " + zone*2 + " zone*2+1 " + zone*2+1);
+          if ( (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long <= longZoneOuter
             && lat > latZoneInner
           ) {
-            // console.log("this is zone#" + zone + " vs " + zonesIndex);
             this.zones[zonesIndex].push(new Location(lat, long));
 
           }
-          else if ((zone % 2 != 0) && (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long > longZoneOuter
+          if (  (zonesIndex % 2 != 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long > longZoneOuter
             && lat > latZoneInner
           ) {
             this.zones[zonesIndex].push(new Location(lat, long));
-            // console.log("this is zone" + zone + " vs " + zonesIndex);
           }
         }
       }// this.dispatchDrivers(lat, long);
@@ -113,15 +108,19 @@ export class GoogleMapsComponent implements OnInit {
     //   }
     //   // this.dispatchDrivers(lat, long);
     // }
-
+    var sum = 0;
     for (let zone1 = 0; zone1 < this.zones.length; zone1++) {
       console.log("********************       #happy" + zone1 + "      **********************" );
-      this.zones[zone1].forEach(loc => {
-        console.log(loc["latitude"] + " " + loc["longitude"]);
-      
-      });
+      // this.zones[zone1].forEach(loc => {
+      //   console.log(loc["latitude"] + " " + loc["longitude"]);
+      sum = sum + this.zones[zone1].length;
+      // });
+      console.log("checking the lenght of the zone : " + zone1 + " - " + this.zones[zone1].length);
       
     }
+    this.zonesManhattan.forEach(loc => {
+        console.log(loc["latitude"] + " " + loc["longitude"]); });
+    console.log("total locations: " + sum);
   }
 
   dispatchDriver(lat: number, long: number): void {
