@@ -16,9 +16,11 @@ export class GoogleMapsComponent implements OnInit {
   gmapElement: any;
 
   map: google.maps.Map;
-  drivers: google.maps.Marker[];
+  // drivers: google.maps.Marker[];
   zones: Location[][];
 
+  driversInput: number = 32;
+  customers: number;
   constructor() {
     // Initialize the zones
     this.zones = [];
@@ -81,46 +83,42 @@ export class GoogleMapsComponent implements OnInit {
 
 
 
-    // Randomly Select addresses and add markers to the map
-    // for (let index = 0; index < 20;) {
-    //   var randomIndex = Math.floor(Math.random() * 48000) + 1
-    //   var lat = this.locsManhattan[randomIndex]["latitude"];
-    //   var long = this.locsManhattan[randomIndex]["longitude"];
+    // Randomly dispatch drivers the first run 
+    var dispatchZone = 0;
+    for (let driver = 0; driver < this.driversInput; driver++) {
+      // var randomIndex = Math.floor(Math.random() * 48000) + 1
+      // var lat = this.locsManhattan[randomIndex]["latitude"];
+      // var long = this.locsManhattan[randomIndex]["longitude"];
 
-    //   // randomly place drivers in 16 zones 
-    //   // console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
-    //   for (let zone = 0; zone < 8; zone++) {
-    //     var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
-    //     var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
-    //     var latZoneInner = this.zonesManhattan[zone]["latitude"];
-    //     if ((zone % 2 == 0) && lat < latZoneOuter && long <= longZoneOuter
-    //       && lat > latZoneInner
-    //     ) {
-    //       this.dispatchDriver(lat, long);
-    //       index++;
-    //     }
-    //     else if ((zone % 2 != 0) && lat < latZoneOuter && long > longZoneOuter
-    //       && lat > latZoneInner
-    //     ) {
-    //       this.dispatchDriver(lat, long);
-    //       index++;
-    //     }
-    //   }
-    //   // this.dispatchDrivers(lat, long);
-    // }
-    var sum = 0;
-    for (let zone1 = 0; zone1 < this.zones.length; zone1++) {
-      console.log("********************       #happy" + zone1 + "      **********************" );
-      // this.zones[zone1].forEach(loc => {
-      //   console.log(loc["latitude"] + " " + loc["longitude"]);
-      sum = sum + this.zones[zone1].length;
-      // });
-      console.log("checking the lenght of the zone : " + zone1 + " - " + this.zones[zone1].length);
-      
+      // randomly place drivers in 16 zones 
+      // console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
+     
+        var randomIndex = Math.floor(Math.random() * this.zones[dispatchZone].length) + 1 
+        var lat = this.zones[dispatchZone][randomIndex]["latitude"];
+        var long = this.zones[dispatchZone][randomIndex]["longitude"];
+         this.dispatchDriver(lat, long);
+        
+      console.log("Driver: " + driver + " is in Zone: "+ dispatchZone + " with lat: " + lat + " & long: "+ long);
+      // drivers 
+      if ( driver != 0 && ((driver+1)%(this.driversInput/16)) ==0){
+        dispatchZone++;
+      }
     }
-    this.zonesManhattan.forEach(loc => {
-        console.log(loc["latitude"] + " " + loc["longitude"]); });
-    console.log("total locations: " + sum);
+    // Display the number of different geo locations in different zones
+    // var sum = 0;
+    // for (let zone1 = 0; zone1 < this.zones.length; zone1++) {
+    //   console.log("********************       #happy" + zone1 + "      **********************" );
+    //   // this.zones[zone1].forEach(loc => {
+    //   //   console.log(loc["latitude"] + " " + loc["longitude"]);
+    //   sum = sum + this.zones[zone1].length;
+    //   // });
+    //   console.log("checking the lenght of the zone : " + zone1 + " - " + this.zones[zone1].length);
+      
+    // }
+    // display the zone boundaries
+    // this.zonesManhattan.forEach(loc => {
+    //     console.log(loc["latitude"] + " " + loc["longitude"]); });
+    // console.log("total locations: " + sum);
   }
 
   dispatchDriver(lat: number, long: number): void {
