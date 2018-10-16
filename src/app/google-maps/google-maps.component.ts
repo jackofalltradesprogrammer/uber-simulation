@@ -19,7 +19,7 @@ export class GoogleMapsComponent implements OnInit {
   // drivers: google.maps.Marker[];
   zones: Location[][];
 
-  driversInput: number = 32;
+  driversInput: number = 64;
   customers: number;
   constructor() {
     // Initialize the zones
