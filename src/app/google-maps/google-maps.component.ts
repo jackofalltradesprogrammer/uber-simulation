@@ -1,6 +1,8 @@
 /// <reference types="@types/googlemaps" />
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '../google-maps/location';
+import { Customer } from '../google-maps/customer';
+import { Driver } from '../google-maps/driver';
 import { LocsMANHATTAN, ZonesMANHATTAN } from '../google-maps/locations-manhattan';
 
 @Component({
@@ -16,20 +18,19 @@ export class GoogleMapsComponent implements OnInit {
   gmapElement: any;
 
   map: google.maps.Map;
-  // drivers: google.maps.Marker[];
+  drivers: Driver[] = [];
+  customers: Customer[] = [];
   zones: Location[][];
 
-  driversInput: number = 64;
-  customers: number;
+  driversInput: number = 20;
+  customerInput: number = 15;
   constructor() {
     // Initialize the zones
     this.zones = [];
     for (let i = 0; i < 16; i++) {
       this.zones[i] = [];
-
-
     }
-
+    this.customers[0]= new Customer(0, null, this.zonesManhattan[0], this.zonesManhattan[0], 0 )
   }
 
   // Get the 50,000 addresses for manhattan & Zones
@@ -86,24 +87,32 @@ export class GoogleMapsComponent implements OnInit {
     // Randomly dispatch drivers the first run 
     var dispatchZone = 0;
     for (let driver = 0; driver < this.driversInput; driver++) {
-      // var randomIndex = Math.floor(Math.random() * 48000) + 1
-      // var lat = this.locsManhattan[randomIndex]["latitude"];
-      // var long = this.locsManhattan[randomIndex]["longitude"];
-
-      // randomly place drivers in 16 zones 
-      // console.log(lat + "vs " + latZoneInner + "dsfdsf " +  index + "vs" + index);
-     
-        var randomIndex = Math.floor(Math.random() * this.zones[dispatchZone].length) + 1 
-        var lat = this.zones[dispatchZone][randomIndex]["latitude"];
-        var long = this.zones[dispatchZone][randomIndex]["longitude"];
-         this.dispatchDriver(lat, long);
+                
+        var randomIndex = Math.floor(Math.random() * this.zones[dispatchZone].length) + 1; 
+        var loc: Location = this.zones[dispatchZone][randomIndex];
+         this.dispatchDriver(loc, driver, dispatchZone);
         
-      console.log("Driver: " + driver + " is in Zone: "+ dispatchZone + " with lat: " + lat + " & long: "+ long);
       // drivers 
-      if ( driver != 0 && ((driver+1)%(this.driversInput/16)) ==0){
-        dispatchZone++;
+      dispatchZone++;
+      if ( dispatchZone == 16){
+        dispatchZone=0;
       }
+     
     }
+
+    // Dispatch a customer 
+    for( let c =1; c <= this.customerInput; c++) {
+      var index1 = Math.floor(Math.random() * 48000) + 1; // random index for pickup address
+      var index2 = Math.floor(Math.random() * 48000) + 1; // random index for dropoff address
+      var pickup: Location = this.locsManhattan[index1];
+      var dropoff: Location = this.locsManhattan[index2];
+      var zone: number = this.findZoneForLatLong(pickup);
+      var customer: Customer;
+      customer = new Customer(c, null, pickup , dropoff, zone)
+      this.customers.push(customer);
+      this.dispatchJob(customer);
+    }
+    
     // Display the number of different geo locations in different zones
     // var sum = 0;
     // for (let zone1 = 0; zone1 < this.zones.length; zone1++) {
@@ -115,21 +124,34 @@ export class GoogleMapsComponent implements OnInit {
     //   console.log("checking the lenght of the zone : " + zone1 + " - " + this.zones[zone1].length);
       
     // }
+
+
     // display the zone boundaries
     // this.zonesManhattan.forEach(loc => {
     //     console.log(loc["latitude"] + " " + loc["longitude"]); });
     // console.log("total locations: " + sum);
+
+    // display driver informatin 
+     this.drivers.forEach(element => {
+       console.log("Driver info " + element.id + " " + element.zone + " " + element.location["latitude"] + "vs" +
+       element.location["longitude"]+ " " + element.customer + " " +element.marker + element.numberOfCustomers);
+     });
+
+     this.customers.forEach(c => {
+      console.log("Customer info" + c.id + " " + c.zone + c.pickup["latitude"] + "vs" +   c.destination["longitude"] + " zone " + c.zone);
+     });
+     
   }
 
-  dispatchDriver(lat: number, long: number): void {
+  dispatchDriver(location: Location, driverId: number, zone: number): void {
     var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var image = '../../assets/utaxi.png';  //downloaded from flaticon
 
-    var loc: any = new google.maps.LatLng(lat, long);
+    var loc: any = new google.maps.LatLng(location["latitude"], location["longitude"]);
     var marker = new google.maps.Marker({
       position: loc,
       map: this.map,
-      //  label: labels[index % labels.length],
+      label: {text: " ", color: "white"},
       icon: image,
       //title: index + 'e'
     });
@@ -137,11 +159,84 @@ export class GoogleMapsComponent implements OnInit {
     //   marker.setMap(null);
     // }
     // use to bounce the marker
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-    // this.drivers.push(marker);
+    marker.setAnimation(google.maps.Animation.DROP);
+    
+    // Add driver to the array
+    this.drivers.push(new Driver(driverId, zone, location, null, marker));
+
 
   }
 
+  dispatchJob(customer: Customer): void {
+    var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var image = '../../assets/customer.png';  //downloaded from flaticon
+
+    var loc: any = new google.maps.LatLng(customer.pickup["latitude"], customer.pickup["longitude"]);
+    var marker = new google.maps.Marker({
+      position: loc,
+      map: this.map,
+      label: {text: " ", color: "white"},
+      icon: image,
+      //title: index + 'e'
+    });
+    
+    // use to bounce the marker
+    marker.setAnimation(google.maps.Animation.DROP);
+    customer.marker = marker;
+    
+    //Find a driver
+    var that = this;
+    setTimeout(function() {
+      that.findAssignDriver(customer);
+      console.log("wating...");
+    }, 12000);
+    
+
+  }
+
+  findAssignDriver(customer: Customer): number{
+    this.drivers.forEach(driver => {
+      if(driver.zone == customer.zone && !driver.idle && !customer.hasDriver){
+        driver.setCustomer(customer);
+        driver.addCustomer();
+        driver.toggleIdle();
+        customer.gotDriver();
+        
+        // console.log("done waiting");
+        driver.marker.setAnimation(google.maps.Animation.BOUNCE);
+        customer.marker.setAnimation(google.maps.Animation.BOUNCE);
+        driver.marker.setLabel("#"+ driver.id);
+        customer.marker.setLabel("Car# " + driver.id);
+      }
+      
+    });
+    return 0;
+  }
+
+  findZoneForLatLong(location: Location): number {
+
+    for (let zonesIndex = 0; zonesIndex < 16; zonesIndex++) {
+      for (let zone = 0; zone < this.zonesManhattan.length-1; zone++) {
+        var lat = location.latitude;
+        var long = location.longitude;
+        var latZoneOuter = this.zonesManhattan[zone + 1]["latitude"];
+        var longZoneOuter = this.zonesManhattan[zone + 1]["longitude"];
+        var latZoneInner = this.zonesManhattan[zone]["latitude"];
+        if ( (zonesIndex % 2 == 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long <= longZoneOuter
+          && lat > latZoneInner
+        ) {
+          return zonesIndex;
+
+        }
+        if (  (zonesIndex % 2 != 0) && ( (zonesIndex == zone*2) || (zonesIndex == zone*2+1) )  && lat < latZoneOuter && long > longZoneOuter
+          && lat > latZoneInner
+        ) {
+          return zonesIndex;
+        }
+      }
+    }
+    
+  }
 
   // Styles for  a custom map  for the simulation
   customMap: any[] = [
