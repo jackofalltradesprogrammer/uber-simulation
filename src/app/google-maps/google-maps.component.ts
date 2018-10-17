@@ -151,8 +151,8 @@ export class GoogleMapsComponent implements OnInit {
     var marker = new google.maps.Marker({
       position: loc,
       map: this.map,
-      label: {text: " ", color: "white"},
-      icon: image,
+      label: {text: "#"+ driverId, color: "white"},
+      icon: {url: image, labelOrigin: new google.maps.Point(40, 25)}
       //title: index + 'e'
     });
     // if (randomIndex % 2 == 0) {
@@ -175,8 +175,8 @@ export class GoogleMapsComponent implements OnInit {
     var marker = new google.maps.Marker({
       position: loc,
       map: this.map,
-      label: {text: " ", color: "white"},
-      icon: image,
+      label: {text: "#" + customer.id, color: "white"},
+      icon: {url: image, labelOrigin: new google.maps.Point(40, 25)}
       //title: index + 'e'
     });
     
@@ -205,8 +205,17 @@ export class GoogleMapsComponent implements OnInit {
         // console.log("done waiting");
         driver.marker.setAnimation(google.maps.Animation.BOUNCE);
         customer.marker.setAnimation(google.maps.Animation.BOUNCE);
-        driver.marker.setLabel("#"+ driver.id);
-        customer.marker.setLabel("Car# " + driver.id);
+        var label = driver.marker.getLabel();
+        label.color = "white";
+        label.text = "#"+ driver.id;
+
+        var label2 = customer.marker.getLabel();
+        label2.color = "white";
+        label2.text = "Car# " + driver.id
+        
+        driver.marker.setLabel(label);
+        // driver.marker.setLabel( );
+        customer.marker.setLabel(label2);
       }
       
     });
